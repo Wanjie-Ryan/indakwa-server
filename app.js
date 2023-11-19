@@ -7,12 +7,15 @@ const xss = require("xss-clean");
 require("dotenv").config();
 const { StatusCodes } = require("http-status-codes");
 const connectionDB = require("./connection/connection");
+const Blog = require("./routes/blog");
 
 app.use(helmet());
 app.use(xss());
 app.use(express.json());
 app.set("trust proxy", 1);
 app.use(cors());
+
+app.use("/api/blogs", Blog);
 
 app.get("/wake-up", (req, res) => {
   res.json({
