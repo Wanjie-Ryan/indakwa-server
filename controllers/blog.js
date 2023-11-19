@@ -44,23 +44,42 @@ const UpdateBlog = async (req, res) => {
   }
 };
 
-const GetBlogs = async(req, res)=>{
+const GetBlogs = async (req, res) => {
+  try {
+    const blogs = await blogsModel.find({});
 
-    try{
-
-        const blogs = await blogsModel.find({})
-
-        return res.status(StatusCodes.OK).json({msg:'The blogs are:', blogs})
-
-
-    }
-
-    catch(err){
-        console.log(err)
-        res
+    return res.status(StatusCodes.OK).json({ msg: "The blogs are:", blogs });
+  } catch (err) {
+    console.log(err);
+    res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ msg: "Something went wrong, please try again later" });
-    }
-}
+  }
+};
 
-module.exports = { CreateBlog, UpdateBlog,GetBlogs };
+const DeleteBlogs = async (req, res) => {
+  const { id: blogId } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(blogId)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Invalid ID" });
+    }
+
+    const blogs = await blogsModel.findByIdAndDelete(blogId);
+
+    if (!blogs) {
+      return res.status(StatusCodes.OK).json({ msg: "Blog was not found" });
+    }
+
+    return res
+      .status(StatusCodes.OK)
+      .json({ msg: "Blog was deleted succesfully" });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Something went wrong, please try again later" });
+  }
+};
+
+module.exports = { CreateBlog, UpdateBlog, GetBlogs, DeleteBlogs };
